@@ -1,0 +1,1105 @@
+<!DOCTYPE html> <html lang="ja"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"> <title>Japanese Kanji Study</title> <style> * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+:root {
+   --bg: #eeeae2;
+    --card-front: #faf8f2;
+    --card-back: #e8f0f2;
+    --primary: #536f7d;
+    --primary-dark: #405963;
+    --text: #2d3335;
+    --muted: #737b7d;
+    --border: #d8d5cd;
+
+    --shadow: 0 10px 30px rgba(30, 50, 80, 0.10);
+    --correct: #22c55e;
+    --wrong: #ef4444;
+}
+
+
+body {
+margin: 0;
+min-height: 100vh;
+font-family:
+-apple-system,
+BlinkMacSystemFont,
+"Segoe UI",
+"Noto Sans JP",
+"Hiragino Kaku Gothic ProN",
+"Yu Gothic",
+Arial,
+sans-serif;
+
+background:
+radial-gradient(circle at top, #ffffff 0%, var(--bg) 55%);
+
+color: var(--text);
+
+display: flex;
+flex-direction: column;
+align-items: center;
+
+padding: 18px 14px 30px;
+
+}
+
+/* =========================
+HEADER
+========================= */
+
+header {
+width: 100%;
+max-width: 650px;
+text-align: center;
+margin-bottom: 15px;
+}
+
+h1 {
+margin: 0;
+font-size: 1.5rem;
+font-weight: 800;
+letter-spacing: 0.03em;
+}
+
+.subtitle {
+margin-top: 5px;
+color: var(--muted);
+font-size: 0.85rem;
+}
+
+/* =========================
+MODE BUTTONS
+========================= */
+
+.mode-switch {
+width: 100%;
+max-width: 650px;
+
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 8px;
+
+margin-bottom: 15px;
+
+}
+
+.mode-btn {
+border: none;
+border-radius: 14px;
+padding: 13px 10px;
+
+background: #e8edf5;
+color: #475569;
+
+font-size: 0.95rem;
+font-weight: 800;
+
+cursor: pointer;
+transition: 0.2s;
+
+}
+
+.mode-btn.active {
+background: var(--primary);
+color: white;
+box-shadow: 0 5px 15px rgba(37, 99, 235, 0.25);
+}
+
+.mode-btn:active {
+transform: scale(0.97);
+}
+
+/* =========================
+FLASHCARD
+========================= */
+
+#flashcardMode {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.flashcard-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto 15px;
+    perspective: 1200px;
+}
+
+.flashcard {
+    height: min(62vh, 440px);
+    min-height: 330px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s ease;
+    cursor: pointer;
+}
+
+
+
+.flashcard.flipped {
+transform: rotateY(180deg);
+}
+
+.card-face {
+position: absolute;
+
+inset: 0;
+
+display: flex;
+align-items: center;
+justify-content: center;
+border-radius: 24px;
+backface-visibility: hidden;
+-webkit-backface-visibility: hidden;
+border: 1px solid var(--border);
+box-shadow: var(--shadow);
+overflow: hidden;
+
+}
+
+.front {
+    background: var(--card-front);
+    flex-direction: column;
+
+    padding: 30px;
+
+    overflow: hidden;
+}
+
+.front::after {
+content: "TAP TO REVEAL";
+
+position: absolute;
+bottom: 20px;
+
+color: #94a3b8;
+
+font-size: 0.7rem;
+font-weight: 700;
+
+letter-spacing: 0.12em;
+
+}
+
+.kanji {
+    font-family:
+        "Noto Sans JP",
+        "Hiragino Kaku Gothic ProN",
+        "Yu Gothic",
+        sans-serif;
+
+    font-size: 120px;
+    line-height: 1.1;
+    font-weight: 500;
+    color: #293234;
+    text-align: center;
+    white-space: nowrap;
+    padding: 20px 25px;
+    transition: font-size 0.15s ease;
+}
+
+.back {
+background: var(--card-back);
+transform: rotateY(180deg);
+flex-direction: column;
+text-align: center;
+padding: 30px;
+
+}
+
+.back .reading {
+font-size: clamp(2rem, 9vw, 3.5rem);
+font-weight: 700;
+color: #1e40af;
+margin-bottom: 20px;
+
+}
+
+.back .meaning {
+font-size: clamp(1.3rem, 5vw, 2rem);
+font-weight: 600;
+color: #334155;
+
+}
+
+/* =========================
+FLASHCARD CONTROLS
+========================= */
+
+.controls {
+    width: 100%;
+    max-width: 1000px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 1fr;
+    gap: 8px;
+    margin: 0 auto 10px;
+}
+
+button {
+font-family: inherit;
+}
+
+.nav-btn {
+border: none;
+border-radius: 14px;
+padding: 14px 8px;
+background: white;
+border: 1px solid var(--border);
+color: var(--text);
+font-size: 0.95rem;
+font-weight: 700;
+cursor: pointer;
+box-shadow: 0 3px 10px rgba(30, 50, 80, 0.06);
+transition: 0.15s;
+
+}
+
+.nav-btn.primary {
+background: var(--primary);
+color: white;
+border-color: var(--primary);
+}
+
+.nav-btn:active {
+transform: scale(0.96);
+}
+
+.counter {
+text-align: center;
+color: var(--muted);
+font-size: 0.85rem;
+margin-bottom: 10px;
+width: 100%;
+max-width: 750px;
+
+}
+
+/* =========================
+QUIZ
+========================= */
+
+.quiz-container {
+width: 100%;
+max-width: 650px;
+}
+
+.quiz-question {
+background: white;
+
+border: 1px solid var(--border);
+
+border-radius: 24px;
+
+min-height: 220px;
+
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+
+box-shadow: var(--shadow);
+
+margin-bottom: 15px;
+
+padding: 25px;
+
+}
+
+.quiz-label {
+color: var(--muted);
+
+font-size: 0.85rem;
+
+font-weight: 700;
+
+margin-bottom: 15px;
+
+}
+
+.quiz-kanji {
+font-family:
+"Noto Sans JP",
+"Hiragino Kaku Gothic ProN",
+"Yu Gothic",
+sans-serif;
+
+font-size: clamp(4rem, 18vw, 7rem);
+
+line-height: 1;
+
+font-weight: 500;
+
+}
+
+.answers {
+display: grid;
+
+grid-template-columns: 1fr 1fr;
+
+gap: 10px;
+
+}
+
+.answer-btn {
+min-height: 75px;
+
+border-radius: 16px;
+
+border: 2px solid var(--border);
+
+background: white;
+
+color: var(--text);
+
+font-size: clamp(1rem, 4vw, 1.2rem);
+
+font-weight: 700;
+
+padding: 10px;
+
+cursor: pointer;
+
+transition: 0.15s;
+
+box-shadow: 0 3px 10px rgba(30, 50, 80, 0.05);
+
+}
+
+.answer-btn:active {
+transform: scale(0.97);
+}
+
+.answer-btn.correct {
+background: #dcfce7;
+border-color: var(--correct);
+color: #166534;
+}
+
+.answer-btn.wrong {
+background: #fee2e2;
+border-color: var(--wrong);
+color: #991b1b;
+}
+
+.answer-btn.disabled {
+pointer-events: none;
+}
+
+.quiz-status {
+  text-align: center;
+  min-height: 45px;
+  margin: 12px 0;
+  padding: 0 10px;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+
+.quiz-status.correct {
+color: var(--correct);
+}
+
+.quiz-status.wrong {
+color: var(--wrong);
+}
+
+.quiz-bottom {
+display: grid;
+
+grid-template-columns: 1fr 1fr;
+
+gap: 8px;
+
+margin-top: 10px;
+
+}
+
+.score {
+text-align: center;
+color: var(--muted);
+font-size: 0.85rem;
+margin-bottom: 12px;
+
+}
+
+/* =========================
+HIDDEN
+========================= */
+
+.hidden {
+display: none !important;
+}
+
+/* =========================
+DESKTOP
+========================= */
+
+@media (min-width: 700px) {
+body {
+padding-top: 35px;
+}
+
+h1 {
+font-size: 1.8rem;
+}
+
+.flashcard {
+height: 430px;
+}
+
+}
+
+/* =========================
+SMALL PHONES
+========================= */
+
+@media (max-width: 380px) {
+body {
+padding: 12px 10px 20px;
+}
+
+.flashcard {
+    width: 100%;
+    height: min(62vh, 440px);
+    min-height: 330px;
+
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.55s ease;
+    cursor: pointer;
+}
+
+
+.answers {
+gap: 7px;
+}
+
+.answer-btn {
+min-height: 68px;
+padding: 7px;
+}
+
+.nav-btn {
+padding: 12px 5px;
+font-size: 0.85rem;
+}
+
+}
+</style>
+
+</head> <body> <header> <h1>日本語 N4 Study </h1> <div class="subtitle">Study anywhere • Tap the card to reveal</div> </header> <!-- MODE SWITCH --> <div class="mode-switch"> <button class="mode-btn active" id="flashcardModeBtn" onclick="setMode('flashcard')"> 🃏 FLASHCARD </button> <button class="mode-btn" id="quizModeBtn" onclick="setMode('quiz')"> 🧠 QUIZ </button> </div> <!-- ========================= FLASHCARD MODE ========================= --> <section id="flashcardMode"> <div class="flashcard-container"> <div class="flashcard" id="card"> <div class="card-face front">
+<div class="kanji" id="front"></div>
+
+</div> <div class="card-face back">
+<div
+  class="reading"
+  id="reading">
+</div>
+
+<div
+  class="meaning"
+  id="meaning">
+</div>
+
+</div> </div> </div> <div class="controls"> <button class="nav-btn" onclick="prevCard()"> ← Previous </button>
+<button class="nav-btn primary" onclick="flipCard()">
+Reveal
+</button>
+
+<button class="nav-btn" onclick="nextCard()">
+Next →
+</button>
+
+</div> <div class="counter" id="counter"> </div> </section> <!-- ========================= QUIZ MODE ========================= --> <section id="quizMode" class="quiz-container hidden"> <div class="quiz-question"> <div class="quiz-label"> What is the reading? </div> <div class="quiz-kanji" id="quizKanji"> </div> </div> <div class="answers" id="answers"> </div> <div class="quiz-status" id="quizStatus"> </div> <div class="score" id="score"> </div> <div class="quiz-bottom"> <button class="nav-btn" onclick="previousQuiz()"> ← Previous </button>
+<button class="nav-btn primary" onclick="nextQuiz()">
+Next →
+</button>
+
+</div> </section> 
+<script>
+/* =====================================================
+WORD LIST
+===================================================== */
+
+let flashcards = [];
+
+/* =====================================================
+   GOOGLE SHEETS DATABASE
+===================================================== */
+
+const GOOGLE_SHEET_URL =
+    "https://docs.google.com/spreadsheets/d/1UydM6SNxmN2ypCnCASez4U8I0CNI8ip6VJPTdPlxmms/gviz/tq?tqx=out:csv&gid=0";
+
+
+async function loadFlashcards() {
+
+    try {
+
+        const response = await fetch(
+          GOOGLE_SHEET_URL
+        );
+
+        if (!response.ok) {
+            throw new Error("Could not load Google Sheet");
+        }
+
+        const csv = await response.text();
+
+        flashcards = parseCSV(csv);
+
+        if (flashcards.length === 0) {
+            throw new Error("No flashcards found");
+        }
+
+        console.log(
+            `Loaded ${flashcards.length} flashcards`
+        );
+
+        return flashcards;
+
+    } catch (error) {
+
+        console.error("Flashcard loading error:", error);
+
+        alert(
+            "Could not load flashcards. " +
+            "Please check your internet connection."
+        );
+
+        return [];
+
+    }
+}
+
+
+/* =====================================================
+   CSV PARSER
+===================================================== */
+
+function parseCSV(csv) {
+
+    const rows = [];
+    let row = [];
+    let value = "";
+    let insideQuotes = false;
+
+    for (let i = 0; i < csv.length; i++) {
+
+        const char = csv[i];
+        const next = csv[i + 1];
+
+        if (char === '"' && insideQuotes && next === '"') {
+
+            value += '"';
+            i++;
+
+        } else if (char === '"') {
+
+            insideQuotes = !insideQuotes;
+
+        } else if (char === "," && !insideQuotes) {
+
+            row.push(value.trim());
+            value = "";
+
+        } else if (
+            (char === "\n" || char === "\r") &&
+            !insideQuotes
+        ) {
+
+            if (value !== "" || row.length > 0) {
+
+                row.push(value.trim());
+                rows.push(row);
+
+            }
+
+            value = "";
+            row = [];
+
+            if (char === "\r" && next === "\n") {
+                i++;
+            }
+
+        } else {
+
+            value += char;
+
+        }
+    }
+
+    // Last row
+    if (value !== "" || row.length > 0) {
+
+        row.push(value.trim());
+        rows.push(row);
+
+    }
+
+
+    if (rows.length < 2) {
+        return [];
+    }
+
+
+    // First row = headers
+    const headers = rows[0].map(
+        header => header.toLowerCase().trim()
+    );
+
+
+    const kanjiIndex = headers.indexOf("kanji");
+    const readingIndex = headers.indexOf("reading");
+    const meaningIndex = headers.indexOf("meaning");
+
+
+    if (
+        kanjiIndex === -1 ||
+        readingIndex === -1 ||
+        meaningIndex === -1
+    ) {
+
+        throw new Error(
+            "Google Sheet must contain kanji, reading and meaning columns."
+        );
+
+    }
+
+
+    return rows
+        .slice(1)
+        .map(row => ({
+
+            kanji: row[kanjiIndex] || "",
+            reading: row[readingIndex] || "",
+            meaning: row[meaningIndex] || ""
+
+        }))
+        .filter(card =>
+            card.kanji &&
+            card.reading &&
+            card.meaning
+        );
+
+}
+
+/* =====================================================
+SHUFFLE
+===================================================== */
+
+function shuffle(array) {
+
+const copy = [...array];
+
+for (let i = copy.length - 1; i > 0; i--) {
+
+const j = Math.floor(Math.random() * (i + 1));
+
+[copy[i], copy[j]] = [copy[j], copy[i]];
+
+}
+
+return copy;
+}
+
+/* =====================================================
+FLASHCARD MODE
+===================================================== */
+
+// Randomize ONCE when the page is opened/refreshed
+let flashcardOrder = [];
+
+let currentIndex = 0;
+
+const front = document.getElementById("front");
+const readingDiv = document.getElementById("reading");
+const meaningDiv = document.getElementById("meaning");
+const counter = document.getElementById("counter");
+const card = document.getElementById("card");
+
+function showCard(index) {
+
+    const data = flashcardOrder[index];
+
+    front.textContent = data.kanji;
+    readingDiv.textContent = data.reading;
+    meaningDiv.textContent = data.meaning;
+
+    counter.textContent =
+        `${index + 1} / ${flashcardOrder.length}`;
+
+    // Always show the front when changing cards
+    card.classList.remove("flipped");
+
+    requestAnimationFrame(() => {
+        fitKanjiToCard();
+    });
+}
+
+function flipCard() {
+    card.classList.toggle("flipped");
+}
+
+function nextCard() {
+
+    // Move through the SAME randomized order
+    if (currentIndex < flashcardOrder.length - 1) {
+        currentIndex++;
+        showCard(currentIndex);
+    }
+
+}
+
+function prevCard() {
+
+    if (currentIndex > 0) {
+        currentIndex--;
+        showCard(currentIndex);
+    }
+
+}
+
+card.addEventListener("click", flipCard);
+
+/* =====================================================
+QUIZ MODE
+===================================================== */
+
+let quizOrder = [];
+
+let quizIndex = 0;
+let quizScore = 0;
+let quizAnswered = false;
+
+const quizKanji = document.getElementById("quizKanji");
+const answers = document.getElementById("answers");
+const quizStatus = document.getElementById("quizStatus");
+const score = document.getElementById("score");
+
+function createQuiz() {
+
+    if (flashcards.length < 4) {
+
+        quizKanji.textContent = "Not enough words";
+
+        answers.innerHTML = "";
+
+        quizStatus.textContent =
+            "Add at least 4 vocabulary entries to your Google Sheet.";
+
+        quizStatus.className = "quiz-status wrong";
+
+        return;
+    }
+
+    quizAnswered = false;
+
+    quizStatus.textContent = "";
+    quizStatus.className = "quiz-status";
+
+    const question = quizOrder[quizIndex];
+
+    quizKanji.textContent = question.kanji;
+
+    const incorrect = shuffle(
+        flashcards.filter(item =>
+            item !== question &&
+            item.reading !== question.reading
+        )
+    );
+
+    const uniqueIncorrect = [];
+
+    for (const item of incorrect) {
+
+        if (!uniqueIncorrect.some(
+            x => x.reading === item.reading
+        )) {
+            uniqueIncorrect.push(item);
+        }
+
+        if (uniqueIncorrect.length === 3) {
+            break;
+        }
+    }
+
+    const choices = shuffle([
+        question,
+        ...uniqueIncorrect
+    ]);
+
+    answers.innerHTML = "";
+
+    choices.forEach(choice => {
+
+        const button = document.createElement("button");
+
+        button.className = "answer-btn";
+        button.textContent = choice.reading;
+
+        button.addEventListener("click", () => {
+            checkAnswer(button, choice, question);
+        });
+
+        answers.appendChild(button);
+    });
+
+    updateScore();
+}
+
+
+function checkAnswer(button, choice, question) {
+
+  if (quizAnswered) {
+    return;
+  }
+
+  quizAnswered = true;
+
+  const buttons = document.querySelectorAll(".answer-btn");
+
+  buttons.forEach(btn => {
+    btn.classList.add("disabled");
+  });
+
+
+  /* =========================
+     CORRECT ANSWER
+  ========================= */
+
+  if (choice.reading === question.reading) {
+
+    button.classList.add("correct");
+
+    quizStatus.textContent =
+      `✓ Correct! ${question.meaning}`;
+
+    quizStatus.classList.add("correct");
+
+    quizScore++;
+
+  }
+
+  /* =========================
+     WRONG ANSWER
+  ========================= */
+
+  else {
+
+    button.classList.add("wrong");
+
+    quizStatus.textContent =
+      `✗ Correct: ${question.reading} — ${question.meaning}`;
+
+    quizStatus.classList.add("wrong");
+
+
+    // Highlight the correct reading
+    buttons.forEach(btn => {
+
+      if (btn.textContent === question.reading) {
+        btn.classList.add("correct");
+      }
+
+    });
+
+  }
+
+  updateScore();
+}
+
+
+function updateScore() {
+
+  score.textContent =
+    `Score: ${quizScore}`;
+}
+
+
+function nextQuiz() {
+
+  quizIndex++;
+
+  if (quizIndex >= quizOrder.length) {
+
+    quizIndex = 0;
+
+    quizOrder = shuffle(flashcards);
+
+    quizScore = 0;
+  }
+
+  createQuiz();
+}
+
+
+function previousQuiz() {
+
+  quizIndex--;
+
+  if (quizIndex < 0) {
+
+    quizIndex = quizOrder.length - 1;
+  }
+
+  createQuiz();
+}
+
+
+/* =====================================================
+MODE SWITCHING
+===================================================== */
+
+const flashcardMode =
+document.getElementById("flashcardMode");
+
+const quizMode =
+document.getElementById("quizMode");
+
+const flashcardModeBtn =
+document.getElementById("flashcardModeBtn");
+
+const quizModeBtn =
+document.getElementById("quizModeBtn");
+
+function setMode(mode) {
+
+if (mode === "flashcard") {
+
+flashcardMode.classList.remove("hidden");
+
+quizMode.classList.add("hidden");
+
+flashcardModeBtn.classList.add("active");
+
+quizModeBtn.classList.remove("active");
+
+} else {
+
+flashcardMode.classList.add("hidden");
+
+quizMode.classList.remove("hidden");
+
+flashcardModeBtn.classList.remove("active");
+
+quizModeBtn.classList.add("active");
+
+createQuiz();
+
+}
+}
+
+/* =====================================================
+KEYBOARD CONTROLS
+===================================================== */
+
+document.addEventListener("keydown", event => {
+
+/*
+Don't interfere with buttons
+or other controls.
+*/
+
+if (event.target.tagName === "BUTTON") {
+return;
+}
+
+if (flashcardMode.classList.contains("hidden")) {
+
+// Quiz mode
+
+if (event.key === "ArrowRight") {
+nextQuiz();
+}
+
+if (event.key === "ArrowLeft") {
+previousQuiz();
+}
+
+} else {
+
+// Flashcard mode
+
+if (event.key === "ArrowRight") {
+nextCard();
+}
+
+if (event.key === "ArrowLeft") {
+prevCard();
+}
+
+if (event.key === " " || event.key === "Enter") {
+
+event.preventDefault();
+
+flipCard();
+}
+
+}
+
+});
+
+/* =====================================================
+KANJI AUTO-SIZING
+===================================================== */
+
+function fitKanjiToCard() {
+    if (!front) return;
+
+    const length = [...front.textContent].length;
+
+    if (length <= 2) {
+        front.style.fontSize = "120px";
+    } else if (length === 3) {
+        front.style.fontSize = "105px";
+    } else if (length === 4) {
+        front.style.fontSize = "75px";
+    } else {
+        front.style.fontSize = "50px";
+    }
+}
+
+/* =====================================================
+   INITIALIZE APP
+===================================================== */
+
+async function initializeApp() {
+
+    // Load vocabulary from Google Sheets
+    await loadFlashcards();
+
+    if (flashcards.length === 0) {
+        return;
+    }
+
+    // Create randomized orders
+    flashcardOrder = shuffle(flashcards);
+    quizOrder = shuffle(flashcards);
+
+    // Reset positions
+    currentIndex = 0;
+    quizIndex = 0;
+    quizScore = 0;
+
+    // Start app
+    showCard(currentIndex);
+    createQuiz();
+
+}
+
+
+/* Start application */
+
+initializeApp();
+
+
+/* Resize handling */
+
+window.addEventListener(
+    "resize",
+    fitKanjiToCard
+);
+
+</script>
+</body>
+</html>
