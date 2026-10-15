@@ -552,15 +552,19 @@ font-size: 0.85rem;
     <!-- =========================
          FLASHCARD MODE
     ========================= -->
-    <section id="flashcardMode">
-        <div class="flashcard-container">
-            <div class="flashcard" id="card">
+  <div id="flashcardMode">
+    <div class="flashcard-container">
+        <div class="flashcard">
+            <div class="flashcard-front">
+                <!-- Front of the flashcard -->
+            </div>
 
-                <!-- FRONT OF CARD -->
-                <div class="card-face front">
-                    <div class="kanji" id="front"></div>
-                </div>
-</div> <div class="card-face back">
+            <div class="flashcard-back">
+                <!-- Back of the flashcard -->
+            </div>
+        </div>
+    </div>
+</div>
 <div
   class="reading"
   id="reading">
@@ -1049,7 +1053,7 @@ function nextQuiz() {
 
     quizIndex = 0;
 
-    quizOrder = shuffle(flashcards);
+    quizOrder = shuffle(activeFlashcards);
 
     quizScore = 0;
   }
@@ -1188,7 +1192,6 @@ function fitKanjiToCard() {
    INITIALIZE APP
 ===================================================== */
 
-async function initializeApp() {
 async function initializeApp() {
     await loadFlashcards();
 
