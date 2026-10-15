@@ -430,6 +430,33 @@ HIDDEN
 display: none !important;
 }
 
+
+/* LESSON SELECTOR — applies at every screen size */
+.lesson-selector {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto 15px;
+}
+
+.lesson-selector label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.lesson-selector select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: white;
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+}
+
 /* =========================
 DESKTOP
 ========================= */
@@ -484,112 +511,71 @@ padding: 12px 5px;
 font-size: 0.85rem;
 }
 
-.lesson-selector {
-    width: 100%;
-    max-width: 650px;
-    margin-bottom: 15px;
-}
-
-.lesson-selector label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--muted);
-}
-
-.lesson-selector select {
-    width: 100%;
-    padding: 13px;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: white;
-    color: var(--text);
-    font: inherit;
-    font-weight: 600;
-}
 
    
 }
 </style>
 
-</head> 
-   <header>
+</head>
+<body>
+    <header>
         <h1>日本語 N4 Study</h1>
-        <div class="subtitle">
-            Study anywhere • Tap the card to reveal
-        </div>
+        <div class="subtitle">Study anywhere • Tap the card to reveal</div>
     </header>
 
     <!-- MODE SWITCH -->
     <div class="mode-switch">
-        <button
-            class="mode-btn active"
-            id="flashcardModeBtn"
-            onclick="setMode('flashcard')"
-        >
+        <button class="mode-btn active" id="flashcardModeBtn" onclick="setMode('flashcard')">
             🃏 FLASHCARD
         </button>
-
-        <button
-            class="mode-btn"
-            id="quizModeBtn"
-            onclick="setMode('quiz')"
-        >
+        <button class="mode-btn" id="quizModeBtn" onclick="setMode('quiz')">
             🧠 QUIZ
         </button>
     </div>
 
-<!-- LESSON SELECTOR: ADD THIS -->
-<div class="lesson-selector">
-    <label for="lessonSelect">Choose Lesson</label>
-    <select id="lessonSelect">
-        <option value="all">All Lessons</option>
-    </select>
-</div>
+    <!-- LESSON SELECTOR -->
+    <div class="lesson-selector">
+        <label for="lessonSelect">Choose Lesson</label>
+        <select id="lessonSelect">
+            <option value="all">All Lessons</option>
+        </select>
+    </div>
 
-
-    <!-- =========================
-         FLASHCARD MODE
-    ========================= -->
-  <div id="flashcardMode">
-    <div class="flashcard-container">
-        <div class="flashcard">
-            <div class="flashcard-front">
-                <!-- Front of the flashcard -->
-            </div>
-
-            <div class="flashcard-back">
-                <!-- Back of the flashcard -->
+    <!-- FLASHCARD MODE -->
+    <div id="flashcardMode">
+        <div class="flashcard-container">
+            <div class="flashcard" id="card">
+                <div class="card-face front" id="front"></div>
+                <div class="card-face back">
+                    <div class="reading" id="reading"></div>
+                    <div class="meaning" id="meaning"></div>
+                </div>
             </div>
         </div>
+
+        <div class="controls">
+            <button class="nav-btn" onclick="prevCard()">← Previous</button>
+            <button class="nav-btn primary" onclick="flipCard()">Reveal</button>
+            <button class="nav-btn" onclick="nextCard()">Next →</button>
+        </div>
+        <div class="counter" id="counter"></div>
     </div>
-</div>
-<div
-  class="reading"
-  id="reading">
-</div>
 
-<div
-  class="meaning"
-  id="meaning">
-</div>
+    <!-- QUIZ MODE -->
+    <section id="quizMode" class="quiz-container hidden">
+        <div class="quiz-question">
+            <div class="quiz-label">What is the reading?</div>
+            <div class="quiz-kanji" id="quizKanji"></div>
+        </div>
+        <div class="answers" id="answers"></div>
+        <div class="quiz-status" id="quizStatus"></div>
+        <div class="score" id="score"></div>
+        <div class="quiz-bottom">
+            <button class="nav-btn" onclick="previousQuiz()">← Previous</button>
+            <button class="nav-btn primary" onclick="nextQuiz()">Next →</button>
+        </div>
+    </section>
 
-</div> </div> </div> <div class="controls"> <button class="nav-btn" onclick="prevCard()"> ← Previous </button>
-<button class="nav-btn primary" onclick="flipCard()">
-Reveal
-</button>
-
-<button class="nav-btn" onclick="nextCard()">
-Next →
-</button>
-
-</div> <div class="counter" id="counter"> </div> </section> <!-- ========================= QUIZ MODE ========================= --> <section id="quizMode" class="quiz-container hidden"> <div class="quiz-question"> <div class="quiz-label"> What is the reading? </div> <div class="quiz-kanji" id="quizKanji"> </div> </div> <div class="answers" id="answers"> </div> <div class="quiz-status" id="quizStatus"> </div> <div class="score" id="score"> </div> <div class="quiz-bottom"> <button class="nav-btn" onclick="previousQuiz()"> ← Previous </button>
-<button class="nav-btn primary" onclick="nextQuiz()">
-Next →
-</button>
-
-</div> </section> 
 <script>
 /* =====================================================
 WORD LIST
