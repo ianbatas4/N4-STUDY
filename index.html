@@ -484,12 +484,82 @@ padding: 12px 5px;
 font-size: 0.85rem;
 }
 
+.lesson-selector {
+    width: 100%;
+    max-width: 650px;
+    margin-bottom: 15px;
+}
+
+.lesson-selector label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.lesson-selector select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: white;
+    color: var(--text);
+    font: inherit;
+    font-weight: 600;
+}
+
+   
 }
 </style>
 
-</head> <body> <header> <h1>日本語 N4 Study </h1> <div class="subtitle">Study anywhere • Tap the card to reveal</div> </header> <!-- MODE SWITCH --> <div class="mode-switch"> <button class="mode-btn active" id="flashcardModeBtn" onclick="setMode('flashcard')"> 🃏 FLASHCARD </button> <button class="mode-btn" id="quizModeBtn" onclick="setMode('quiz')"> 🧠 QUIZ </button> </div> <!-- ========================= FLASHCARD MODE ========================= --> <section id="flashcardMode"> <div class="flashcard-container"> <div class="flashcard" id="card"> <div class="card-face front">
-<div class="kanji" id="front"></div>
+</head> 
+   <header>
+        <h1>日本語 N4 Study</h1>
+        <div class="subtitle">
+            Study anywhere • Tap the card to reveal
+        </div>
+    </header>
 
+    <!-- MODE SWITCH -->
+    <div class="mode-switch">
+        <button
+            class="mode-btn active"
+            id="flashcardModeBtn"
+            onclick="setMode('flashcard')"
+        >
+            🃏 FLASHCARD
+        </button>
+
+        <button
+            class="mode-btn"
+            id="quizModeBtn"
+            onclick="setMode('quiz')"
+        >
+            🧠 QUIZ
+        </button>
+    </div>
+
+<!-- LESSON SELECTOR: ADD THIS -->
+<div class="lesson-selector">
+    <label for="lessonSelect">Choose Lesson</label>
+    <select id="lessonSelect">
+        <option value="all">All Lessons</option>
+    </select>
+</div>
+
+
+    <!-- =========================
+         FLASHCARD MODE
+    ========================= -->
+    <section id="flashcardMode">
+        <div class="flashcard-container">
+            <div class="flashcard" id="card">
+
+                <!-- FRONT OF CARD -->
+                <div class="card-face front">
+                    <div class="kanji" id="front"></div>
+                </div>
 </div> <div class="card-face back">
 <div
   class="reading"
@@ -642,46 +712,101 @@ function parseCSV(csv) {
     }
 
 
+ 
     // First row = headers
     const headers = rows[0].map(
         header => header.toLowerCase().trim()
     );
 
-
+    const lessonIndex = headers.indexOf("lesson");
     const kanjiIndex = headers.indexOf("kanji");
     const readingIndex = headers.indexOf("reading");
     const meaningIndex = headers.indexOf("meaning");
 
-
     if (
+        lessonIndex === -1 ||
         kanjiIndex === -1 ||
         readingIndex === -1 ||
         meaningIndex === -1
     ) {
-
         throw new Error(
-            "Google Sheet must contain kanji, reading and meaning columns."
+            "Google Sheet must contain lesson, kanji, reading and meaning columns."
         );
-
     }
-
 
     return rows
         .slice(1)
         .map(row => ({
-
-            kanji: row[kanjiIndex] || "",
-            reading: row[readingIndex] || "",
-            meaning: row[meaningIndex] || ""
-
+            lesson: (row[lessonIndex] || "").trim(),
+            kanji: (row[kanjiIndex] || "").trim(),
+            reading: (row[readingIndex] || "").trim(),
+            meaning: (row[meaningIndex] || "").trim()
         }))
         .filter(card =>
+            card.lesson &&
             card.kanji &&
             card.reading &&
             card.meaning
         );
-
 }
+
+
+let activeFlashcards = [];
+
+const lessonSelect =
+    document.getElementById("lessonSelect");
+
+function populateLessons() {
+    const lessons = [
+        ...new Set(flashcards.map(card => card.lesson))
+    ];
+
+    lessons.sort((a, b) =>
+        a.localeCompare(b, undefined, {
+            numeric: true
+        })
+    );
+
+    lessonSelect.innerHTML =
+        '<option value="all">All Lessons</option>';
+
+    lessons.forEach(lesson => {
+        const option = document.createElement("option");
+
+        option.value = lesson;
+        option.textContent = lesson;
+
+        lessonSelect.appendChild(option);
+    });
+}
+
+function selectLesson() {
+    const selectedLesson = lessonSelect.value;
+
+    activeFlashcards = selectedLesson === "all"
+        ? [...flashcards]
+        : flashcards.filter(
+            card => card.lesson === selectedLesson
+        );
+
+    flashcardOrder = shuffle(activeFlashcards);
+    quizOrder = shuffle(activeFlashcards);
+
+    currentIndex = 0;
+    quizIndex = 0;
+    quizScore = 0;
+    quizAnswered = false;
+
+    if (activeFlashcards.length > 0) {
+        showCard(currentIndex);
+        createQuiz();
+    }
+}
+
+lessonSelect.addEventListener("change", selectLesson);
+
+
+   
 
 /* =====================================================
 SHUFFLE
@@ -778,7 +903,7 @@ const score = document.getElementById("score");
 
 function createQuiz() {
 
-    if (flashcards.length < 4) {
+    if (activeFlashcards.length < 4) {
 
         quizKanji.textContent = "Not enough words";
 
@@ -802,7 +927,7 @@ function createQuiz() {
     quizKanji.textContent = question.kanji;
 
     const incorrect = shuffle(
-        flashcards.filter(item =>
+        activeFlashcards.filter(item =>
             item !== question &&
             item.reading !== question.reading
         )
@@ -1064,28 +1189,24 @@ function fitKanjiToCard() {
 ===================================================== */
 
 async function initializeApp() {
-
-    // Load vocabulary from Google Sheets
+async function initializeApp() {
     await loadFlashcards();
 
     if (flashcards.length === 0) {
         return;
     }
 
-    // Create randomized orders
-    flashcardOrder = shuffle(flashcards);
-    quizOrder = shuffle(flashcards);
+    populateLessons();
 
-    // Reset positions
-    currentIndex = 0;
-    quizIndex = 0;
-    quizScore = 0;
+    // Select the first available lesson
+    lessonSelect.value =
+        lessonSelect.options.length > 1
+            ? lessonSelect.options[1].value
+            : "all";
 
-    // Start app
-    showCard(currentIndex);
-    createQuiz();
-
+    selectLesson();
 }
+
 
 
 /* Start application */
